@@ -1,0 +1,75 @@
+.app {
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 20px;
+  height: 100vh;
+  background-color: #f8f9fd;
+}
+
+.login-form {
+  width: 350px;
+  background-color: white;
+  padding: 3rem 2rem;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+input[type='text'],
+input[type='password'] {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  padding: 5px 10px;
+  outline: none;
+}
+
+button[type='submit'] {
+  margin-top: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  background: #01d28e;
+  border: 1px solid #01d28e;
+  color: #fff;
+  margin: 10px auto 0;
+  display: block;
+}
+
+input[type='submit']:hover {
+  background: #6cf0c2;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+}
+
+.list-container {
+  display: flex;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+}
+
+.title {
+  font-size: 25px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.forgotPass {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.ant-space {
+  display: block !important;
+}
