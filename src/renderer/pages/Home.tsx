@@ -36,10 +36,11 @@ function Home() {
         setBtnLoading({ ...btnLoading, [body.id]: false });
         return false;
       }
-      await window.open(
+      window.open(
         `${data.dashboardURL}?data=${JSON.stringify(data)}`,
         '_blank'
       );
+      message.loading('Action in progress..', 2.5);
       setBtnLoading({ ...btnLoading, [body.id]: false });
     } catch (error) {
       setBtnLoading({ ...btnLoading, [body.id]: false });
@@ -131,9 +132,7 @@ function Home() {
       const data = [];
       setLoading(true);
       let path = `orders?per_page=99&orderby=id&status=completed`;
-      if (token.role.includes('customer')) {
-        path = `${path}&customer=${token.user_id}`;
-      }
+      path = `${path}&customer=${token.user_id}`;
       const orders = await window.WooCommerce.get(path);
       if (orders && orders.length > 0) {
         let i = 1;

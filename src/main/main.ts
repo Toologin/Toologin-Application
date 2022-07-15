@@ -1,40 +1,11 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-await-in-loop */
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 import path from 'path';
-import {
-  app,
-  autoUpdater,
-  dialog,
-  BrowserWindow,
-  session,
-  screen,
-} from 'electron';
+import { app, BrowserWindow, session, screen } from 'electron';
 import { resolveHtmlPath } from './util';
-
-const server = 'https://hazel-63ng.vercel.app/';
-const url = `${server}/update/${process.platform}/${app.getVersion()}`;
-autoUpdater.setFeedURL({ url });
-
-setInterval(() => {
-  autoUpdater.checkForUpdates();
-}, 120000);
-
-autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
-  const dialogOpts = {
-    type: 'info',
-    buttons: ['Restart', 'Later'],
-    title: 'Application Update',
-    message: process.platform === 'win32' ? releaseNotes : releaseName,
-    detail:
-      'A new version has been downloaded. Restart the application to apply the updates.',
-  };
-
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) autoUpdater.quitAndInstall();
-  });
-});
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -69,22 +40,22 @@ const createWindow = async (arg?, fixed? = false) => {
   }
 
   if (args.url && args.cookies) {
-    if (typeof args.cookies === 'object' && args.cookies.length > 0) {
-      args.cookies.forEach((cookie) => {
-        try {
-          session.defaultSession.cookies.set({
-            url: args.url,
-            name: cookie.name,
-            path: cookie.path,
-            value: cookie.value,
-            domain: cookie.domain,
-            secure: cookie.secure,
-            httpOnly: cookie.httpOnly,
-          });
-        } catch (error) {
-          console.log(error);
-        }
+    try {
+      const { url, cookies } = args;
+      cookies.forEach((cookie) => {
+        const { name, path, value, domain, secure, httpOnly } = cookie;
+        session.defaultSession.cookies.set({
+          url,
+          name,
+          path,
+          value,
+          domain,
+          secure,
+          httpOnly,
+        });
       });
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -134,7 +105,7 @@ const createWindow = async (arg?, fixed? = false) => {
     });
 
     mainWindow.webContents.on('login', (event, request, authInfo, callback) => {
-      console.log(authInfo);
+      console.log(`Proxy: ${authInfo.host}:${authInfo.port}`);
       callback(proxy.user, proxy.pass);
     });
   }
