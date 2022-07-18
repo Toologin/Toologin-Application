@@ -5,7 +5,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 import path from 'path';
-import { app, BrowserWindow, session, screen, shell } from 'electron';
+import { app, BrowserWindow, session, screen, shell, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { resolveHtmlPath } from './util';
 
@@ -16,15 +16,6 @@ if (process.env.NODE_ENV === 'production') {
 
 const isDev =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
-
-class AppUpdater {
-  constructor() {
-    autoUpdater.logger = require('electron-log');
-    autoUpdater.logger.transports.file.level = 'info';
-    autoUpdater.autoDownload = true;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
 
 const installExtensions = async () => {
   const installer = require('@toologin/toologin-extension-installer');
@@ -152,8 +143,6 @@ const createWindow = async (arg?) => {
     mainWindow = null;
   });
 
-  await new AppUpdater();
-
   mainWindow.webContents.setWindowOpenHandler(async (details) => {
     const params = new URL(details.url);
     const data = JSON.parse(params.searchParams.get('data'));
@@ -173,9 +162,24 @@ const createWindow = async (arg?) => {
   });
 };
 
-/**
- * Add event listeners...
- */
+setInterval(() => {
+  autoUpdater.checkForUpdatesAndNotify();
+}, 120000);
+
+autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+  const dialogOpts = {
+    type: 'info',
+    buttons: ['Restart', 'Later'],
+    title: 'Application Update',
+    message: process.platform === 'win32' ? releaseNotes : releaseName,
+    detail:
+      'A new version has been downloaded. Restart the application to apply the updates.',
+  };
+
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) autoUpdater.quitAndInstall();
+  });
+});
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
