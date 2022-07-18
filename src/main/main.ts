@@ -22,11 +22,8 @@ class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
-    if (isDev) {
-      autoUpdater.checkForUpdates();
-    } else {
-      autoUpdater.checkForUpdatesAndNotify();
-    }
+    autoUpdater.autoDownload = true;
+    autoUpdater.checkForUpdatesAndNotify();
   }
 }
 
