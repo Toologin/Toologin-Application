@@ -4,7 +4,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 import path from 'path';
-import { app, BrowserWindow, session, screen } from 'electron';
+import { app, BrowserWindow, session, screen, shell } from 'electron';
 import { resolveHtmlPath } from './util';
 
 if (process.env.NODE_ENV === 'production') {
@@ -15,12 +15,33 @@ if (process.env.NODE_ENV === 'production') {
 const isDev =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
-const createWindow = async (arg?, fixed? = false) => {
+let adminBrowser = null;
+
+const installExtensions = async () => {
+  const installer = require('@toologin/toologin-extension-installer');
+  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+  const extensions = ['TOOLOGIN_EXTENSION'];
+
+  return installer
+    .default(
+      extensions.map((name) => installer[name]),
+      forceDownload
+    )
+    .catch(console.log);
+};
+
+const createWindow = async (arg?) => {
+  console.log(1);
+
+  if (!isDev) {
+    await installExtensions();
+  }
+
   if (isDev) {
-    // require('electron-debug')();
-    // await session.defaultSession.loadExtension(
-    //   path.join(__dirname, '../../extensions/react-devtool')
-    // );
+    require('electron-debug')();
+    await session.defaultSession.loadExtension(
+      path.join(__dirname, '../../extensions/Toologin')
+    );
   }
 
   let mainWindow: BrowserWindow | null = null;
@@ -32,8 +53,6 @@ const createWindow = async (arg?, fixed? = false) => {
     url: arg && arg.dashboardURL ? arg.dashboardURL : null,
     storage: arg && arg.localStorage ? arg.localStorage : null,
   };
-
-  console.log(1);
 
   if (args.agent) {
     await session.defaultSession.setUserAgent(args.agent);
@@ -69,8 +88,6 @@ const createWindow = async (arg?, fixed? = false) => {
 
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
-
-  console.log(2);
 
   mainWindow = new BrowserWindow({
     icon: getAssetPath('icon.png'),
@@ -110,42 +127,36 @@ const createWindow = async (arg?, fixed? = false) => {
     });
   }
 
-  console.log(3);
-
-  mainWindow.webContents.on('did-start-navigation', () => {
-    mainWindow.webContents.executeJavaScript(`
-      if(document.getElementById("srf-browser-unhappy")) {
-        document.getElementById("srf-browser-unhappy").remove();
-      }
-    `);
-  });
+  console.log(2);
 
   await mainWindow.loadURL(
     (await args.url) || (await resolveHtmlPath('index.html'))
   );
 
-  console.log(4);
+  console.log(3);
 
   await mainWindow.show();
-
-  if (fixed) {
-    mainWindow.close();
-  }
 
   await mainWindow.on('closed', () => {
     mainWindow = null;
   });
 
   // Open urls in the user's browser
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    const params = new URL(url);
-    const data = params.searchParams.get('data');
+  mainWindow.webContents.setWindowOpenHandler(async (details) => {
+    const params = new URL(details.url);
+    const data = JSON.parse(params.searchParams.get('data'));
     if (data) {
-      createWindow(JSON.parse(params.searchParams.get('data')));
-    } else {
-      // shell.openExternal(url);
+      if (mainWindow) {
+        await createWindow(data);
+        mainWindow.webContents.send('load_success', data);
+      }
+      if (isDev && !adminBrowser) {
+        data.dashboardURL = data.loginURL;
+        adminBrowser = await createWindow(data);
+      }
+    } else if (!details.url.includes('toolsurf.com')) {
+      shell.openExternal(details.url);
     }
-
     return { action: 'deny' };
   });
 };

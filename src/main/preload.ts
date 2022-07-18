@@ -1,8 +1,5 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
-
-// const WooCommerceAPI = require('woocommerce-api');
 import WooCommerceAPI from '@woocommerce/woocommerce-rest-api';
-
 import config from '../renderer/config.json';
 
 export const WooCommerce = new WooCommerceAPI({

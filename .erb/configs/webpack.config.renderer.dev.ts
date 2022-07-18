@@ -123,7 +123,7 @@ const configuration: webpack.Configuration = {
      */
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
-      SERVER_URL: 'http://localhost:3100',
+      SERVER_URL: 'https://api.toologin.com',
       SHOP_DOMAIN: 'sharetools.dev',
     }),
 

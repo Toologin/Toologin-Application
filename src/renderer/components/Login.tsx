@@ -57,7 +57,7 @@ export default function Login({ setToken }) {
           {message && <Alert message={parse(message)} type="error" />}
           <form onSubmit={handleSubmit}>
             <div className="input-container">
-              <label>Username </label>
+              <label>Email </label>
               <input
                 type="text"
                 onChange={(e) => setUserName(e.target.value)}
@@ -83,7 +83,7 @@ export default function Login({ setToken }) {
         </div>
         <div className="forgotPass">
           <a href={forgotLink} target="_blank" rel="noreferrer">
-            Quên mật khẩu?
+            Bạn quên mật khẩu?
           </a>
         </div>
       </div>

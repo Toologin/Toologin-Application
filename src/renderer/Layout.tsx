@@ -15,7 +15,7 @@ function logout() {
 const contentAvatar = (
   <div>
     <Link className="logout" to="/" onClick={logout}>
-      Logout
+      Thoát
     </Link>
   </div>
 );

@@ -1,3 +1,5 @@
+/* eslint-disable promise/catch-or-return */
+/* eslint-disable consistent-return */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-console */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -7,17 +9,39 @@ import { Table, Button, Space, message, Typography } from 'antd';
 import { ArrowRightOutlined, UndoOutlined } from '@ant-design/icons';
 import UseToken from '../components/useToken';
 
+const bar = message;
 const { Text } = Typography;
 
 function Home() {
   const { token } = UseToken();
   const [loading, setLoading] = useState(false);
+  const [btnLoading, setBtnLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
-  const [btnLoading, setBtnLoading] = useState({});
+
+  function destroy() {
+    bar.destroy();
+    setBtnLoading(false);
+    return false;
+  }
+
+  window.electron.ipcRenderer.on('load_success', () => {
+    destroy();
+  });
 
   async function accessData(path, body) {
     try {
-      setBtnLoading({ ...btnLoading, [body.id]: true });
+      bar
+        .loading('Đã kết nối tới máy chủ.....', 2.5)
+        .then(() =>
+          bar.loading(`Đang tải dữ liệu từ ${body.path.toUpperCase()}.....`, 10)
+        )
+        .then(() =>
+          bar.loading(
+            'Server đang nạp tool, hãy click nút "Refresh" và đăng nhập lại nếu quá 15 giây chờ đợi.',
+            99
+          )
+        );
+      setBtnLoading(true);
       const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -33,51 +57,38 @@ function Home() {
           return window.location.reload();
         }
         message.error(data.error);
-        setBtnLoading({ ...btnLoading, [body.id]: false });
-        return false;
+        destroy();
       }
       window.open(
-        `${data.dashboardURL}?data=${JSON.stringify(data)}`,
+        `https://toologin.com?data=${JSON.stringify(data)}`,
         '_blank'
       );
-      message.loading('Action in progress..', 2.5);
-      setBtnLoading({ ...btnLoading, [body.id]: false });
     } catch (error) {
-      setBtnLoading({ ...btnLoading, [body.id]: false });
-      window.location.reload();
+      destroy();
     }
   }
 
   const columns = [
     {
-      title: 'STT',
+      title: 'TT',
       dataIndex: 'stt',
       key: 'stt',
       align: 'center',
     },
-    // {
-    //   title: 'Trạng thái',
-    //   dataIndex: 'status',
-    //   key: 'status',
-    //   render: (_, { status }) => (
-    //     <>
-    //       <Badge status={status === 'completed' ? 'success' : ''} />{' '}
-    //       {status === 'completed' ? 'Có sẵn' : ''}
-    //     </>
-    //   ),
-    // },
     {
-      title: 'Tên sản phẩm',
+      title: 'Tên công cụ',
       dataIndex: 'name',
       key: 'name',
       render: (_, { name }) => (
         <>
-          <img
-            src={name.image}
-            alt={name.name}
-            height="50px"
-            style={{ marginRight: '10px' }}
-          />{' '}
+          {name.image && (
+            <img
+              src={name.image}
+              alt=""
+              height="50px"
+              style={{ marginRight: '10px' }}
+            />
+          )}
           {name.name}
         </>
       ),
@@ -98,7 +109,6 @@ function Home() {
         </>
       ),
     },
-
     {
       title: '',
       dataIndex: 'actions',
@@ -111,15 +121,16 @@ function Home() {
               <Button
                 type="primary"
                 onClick={() => accessData(actions.path, actions)}
-                loading={btnLoading[actions.id] === true}
+                block
+                disabled={btnLoading}
               >
-                Access Now <ArrowRightOutlined />
+                Đăng nhập <ArrowRightOutlined />
               </Button>
             </Space>
           )}
           {actions.expire_date !== null && actions.expired_status === true && (
-            <Button type="primary" disabled>
-              Access Now
+            <Button type="primary" block disabled>
+              Đã hết hạn
             </Button>
           )}
         </>
@@ -150,7 +161,6 @@ function Home() {
                 expire_date: item.expire_date,
                 expired_status: item.expired_status,
               },
-              status: order.status,
               actions: {
                 id: item.id,
                 user: token,
@@ -179,13 +189,14 @@ function Home() {
   }, []);
 
   const refresh = () => {
+    setBtnLoading(false);
     setDataSource([]);
     getOrders();
   };
 
   return (
     <>
-      <h1>Tool List</h1>
+      <h1>Tools đã mua</h1>
       <div className="btn_actions">
         <Button type="dashed" shape="round" onClick={refresh}>
           <UndoOutlined /> Refresh

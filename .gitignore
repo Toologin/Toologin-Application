@@ -32,3 +32,4 @@ k8s/
 entryScript.sh
 nginx/
 src/renderer/config.json
+extensions/
