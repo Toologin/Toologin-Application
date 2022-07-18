@@ -261,7 +261,8 @@
     "publish": {
       "provider": "github",
       "owner": "dgiangdev",
-      "repo": "Toologin-Packed"
+      "repo": "Toologin-Packed",
+      "releaseType": "release"
     }
   },
   "collective": {

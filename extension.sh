@@ -1,4 +1,4 @@
 #!/bin/bash
 grunt
 cd extensions/
-cp -v Toologin.crx C:/Users/DGiang/Desktop/Toologin/Toologin.crx
+cp -v Toologin.crx C:/Users/DGiang/Desktop/Toologin.crx
