@@ -33,3 +33,4 @@ entryScript.sh
 nginx/
 src/renderer/config.json
 extensions/
+assets/build/
