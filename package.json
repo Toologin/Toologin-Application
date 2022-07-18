@@ -193,7 +193,7 @@
   },
   "build": {
     "productName": "Toologin",
-    "appId": "com.apple.toologin",
+    "appId": "org.erb.toologin",
     "artifactName": "${productName}.${ext}",
     "compression": "maximum",
     "asar": true,
