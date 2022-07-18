@@ -176,8 +176,7 @@ autoUpdater.on('update-downloaded', (info) => {
     title: 'Application Update',
     message:
       process.platform === 'win32' ? info.releaseNotes.note : info.releaseName,
-    detail:
-      'A new version has been downloaded. Restart the application to apply the updates.',
+    detail: `A new version ${info.version} has been downloaded. Restart the application to apply the updates.`,
   };
   dialog.showMessageBox(dialogOpts).then((returnValue) => {
     if (returnValue.response === 0) autoUpdater.quitAndInstall();
