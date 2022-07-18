@@ -31,7 +31,6 @@ const installExtensions = async () => {
 };
 
 let adminBrowser = null;
-
 const createWindow = async (arg?) => {
   console.log(1);
 
@@ -164,22 +163,7 @@ const createWindow = async (arg?) => {
 
 setInterval(() => {
   autoUpdater.checkForUpdatesAndNotify();
-}, 120000);
-
-autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
-  const dialogOpts = {
-    type: 'info',
-    buttons: ['Restart', 'Later'],
-    title: 'Application Update',
-    message: process.platform === 'win32' ? releaseNotes : releaseName,
-    detail:
-      'A new version has been downloaded. Restart the application to apply the updates.',
-  };
-
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) autoUpdater.quitAndInstall();
-  });
-});
+}, 30000);
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
@@ -199,6 +183,21 @@ app
       if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
       }
+    });
+
+    autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+      const dialogOpts = {
+        type: 'info',
+        buttons: ['Restart', 'Later'],
+        title: 'Application Update',
+        message: process.platform === 'win32' ? releaseNotes : releaseName,
+        detail:
+          'A new version has been downloaded. Restart the application to apply the updates.',
+      };
+
+      dialog.showMessageBox(dialogOpts).then((returnValue) => {
+        if (returnValue.response === 0) autoUpdater.quitAndInstall();
+      });
     });
   })
   .catch(console.log);
