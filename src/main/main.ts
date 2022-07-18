@@ -162,8 +162,27 @@ const createWindow = async (arg?) => {
 };
 
 setInterval(() => {
-  autoUpdater.checkForUpdatesAndNotify();
+  autoUpdater.checkForUpdates();
 }, 30000);
+
+autoUpdater.on('update-available', (info) => {
+  appUpdater.downloadUpdate();
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  const dialogOpts = {
+    type: 'info',
+    buttons: ['Restart', 'Later'],
+    title: 'Application Update',
+    message:
+      process.platform === 'win32' ? info.releaseNotes.note : info.releaseName,
+    detail:
+      'A new version has been downloaded. Restart the application to apply the updates.',
+  };
+  dialog.showMessageBox(dialogOpts).then((returnValue) => {
+    if (returnValue.response === 0) autoUpdater.quitAndInstall();
+  });
+});
 
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
@@ -177,28 +196,12 @@ app
   .whenReady()
   .then(async () => {
     await createWindow();
-
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
       }
-    });
-
-    autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
-      const dialogOpts = {
-        type: 'info',
-        buttons: ['Restart', 'Later'],
-        title: 'Application Update',
-        message: process.platform === 'win32' ? releaseNotes : releaseName,
-        detail:
-          'A new version has been downloaded. Restart the application to apply the updates.',
-      };
-
-      dialog.showMessageBox(dialogOpts).then((returnValue) => {
-        if (returnValue.response === 0) autoUpdater.quitAndInstall();
-      });
     });
   })
   .catch(console.log);
