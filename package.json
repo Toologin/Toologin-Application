@@ -27,9 +27,9 @@
   },
   "contributors": [
     {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
+      "name": "Giang Nguyen",
+      "email": "dinhgiang2611@gmail.com",
+      "url": "https://github.com/djiangdev"
     }
   ],
   "main": "./src/main/main.ts",
@@ -260,9 +260,6 @@
       "owner": "Toologin",
       "repo": "Toologin-Application"
     }
-  },
-  "collective": {
-    "url": "https://opencollective.com/electron-react-boilerplate-594"
   },
   "devEngines": {
     "node": ">=14.x",
