@@ -194,7 +194,7 @@
   "build": {
     "productName": "Toologin",
     "appId": "com.apple.toologin",
-    "artifactName": "${productName}.${ext}",
+    "compression": "maximum",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
