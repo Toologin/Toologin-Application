@@ -5,7 +5,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 import path from 'path';
-import { app, BrowserWindow, session, screen, shell, dialog } from 'electron';
+import { app, BrowserWindow, session, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import { resolveHtmlPath } from './util';
 
@@ -16,6 +16,17 @@ if (process.env.NODE_ENV === 'production') {
 
 const isDev =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+
+class AppUpdater {
+  constructor() {
+    autoUpdater.logger = require('electron-log');
+    autoUpdater.logger.transports.file.level = 'info';
+    autoUpdater.checkForUpdatesAndNotify();
+    setTimeout(() => {
+      autoUpdater.checkForUpdates();
+    }, 360000);
+  }
+}
 
 const installExtensions = async () => {
   const installer = require('@toologin/toologin-extension-installer');
@@ -31,6 +42,7 @@ const installExtensions = async () => {
 };
 
 let adminBrowser = null;
+
 const createWindow = async (arg?) => {
   console.log(1);
 
@@ -142,6 +154,8 @@ const createWindow = async (arg?) => {
     mainWindow = null;
   });
 
+  await new AppUpdater();
+
   mainWindow.webContents.setWindowOpenHandler(async (details) => {
     const params = new URL(details.url);
     const data = JSON.parse(params.searchParams.get('data'));
@@ -160,10 +174,6 @@ const createWindow = async (arg?) => {
     return { action: 'deny' };
   });
 };
-
-setInterval(() => {
-  autoUpdater.checkForUpdatesAndNotify();
-}, 30000);
 
 autoUpdater.on('update-available', (info) => {
   appUpdater.downloadUpdate();
@@ -192,7 +202,7 @@ app.on('window-all-closed', () => {
 });
 
 app
-  .whenReady()
+  .whenReady(async () => {})
   .then(async () => {
     await createWindow();
     app.on('activate', () => {
