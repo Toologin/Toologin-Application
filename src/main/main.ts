@@ -7,7 +7,6 @@
 import path from 'path';
 import { app, BrowserWindow, session, screen, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
 import { resolveHtmlPath } from './util';
 
 if (process.env.NODE_ENV === 'production') {
@@ -20,8 +19,8 @@ const isDev =
 
 class AppUpdater {
   constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
+    autoUpdater.logger = require('electron-log');
+    autoUpdater.logger.transports.file.level = 'info';
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
@@ -89,7 +88,7 @@ const createWindow = async (arg?) => {
     }
   }
 
-  const RESOURCES_PATH = !isDev
+  const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../../assets');
 
@@ -101,14 +100,14 @@ const createWindow = async (arg?) => {
   const { width, height } = primaryDisplay.workAreaSize;
 
   mainWindow = new BrowserWindow({
-    icon: getAssetPath('icon.png'),
     width,
     height,
     show: false,
     autoHideMenuBar: true,
+    icon: getAssetPath('icon.png'),
     webPreferences: {
-      devTools: isDev,
-      preload: !isDev
+      devTools: !app.isPackaged,
+      preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
@@ -152,6 +151,8 @@ const createWindow = async (arg?) => {
     mainWindow = null;
   });
 
+  await new AppUpdater();
+
   mainWindow.webContents.setWindowOpenHandler(async (details) => {
     const params = new URL(details.url);
     const data = JSON.parse(params.searchParams.get('data'));
@@ -169,8 +170,6 @@ const createWindow = async (arg?) => {
     }
     return { action: 'deny' };
   });
-
-  new AppUpdater();
 };
 
 /**
