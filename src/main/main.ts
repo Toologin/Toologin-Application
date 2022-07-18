@@ -1,3 +1,4 @@
+/* eslint-disable no-new */
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable no-plusplus */
@@ -5,6 +6,8 @@
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 import path from 'path';
 import { app, BrowserWindow, session, screen, shell } from 'electron';
+import { autoUpdater } from 'electron-updater';
+import log from 'electron-log';
 import { resolveHtmlPath } from './util';
 
 if (process.env.NODE_ENV === 'production') {
@@ -15,7 +18,17 @@ if (process.env.NODE_ENV === 'production') {
 const isDev =
   process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
 
-let adminBrowser = null;
+class AppUpdater {
+  constructor() {
+    log.transports.file.level = 'info';
+    autoUpdater.logger = log;
+    if (isDev) {
+      autoUpdater.checkForUpdates();
+    } else {
+      autoUpdater.checkForUpdatesAndNotify();
+    }
+  }
+}
 
 const installExtensions = async () => {
   const installer = require('@toologin/toologin-extension-installer');
@@ -29,6 +42,8 @@ const installExtensions = async () => {
     )
     .catch(console.log);
 };
+
+let adminBrowser = null;
 
 const createWindow = async (arg?) => {
   console.log(1);
@@ -141,7 +156,6 @@ const createWindow = async (arg?) => {
     mainWindow = null;
   });
 
-  // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler(async (details) => {
     const params = new URL(details.url);
     const data = JSON.parse(params.searchParams.get('data'));
@@ -159,6 +173,8 @@ const createWindow = async (arg?) => {
     }
     return { action: 'deny' };
   });
+
+  new AppUpdater();
 };
 
 /**
