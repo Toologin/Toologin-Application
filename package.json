@@ -258,7 +258,8 @@
     "publish": {
       "provider": "github",
       "owner": "Toologin",
-      "repo": "Toologin-Application"
+      "repo": "Toologin-Application",
+      "releaseType": "release"
     }
   },
   "devEngines": {
