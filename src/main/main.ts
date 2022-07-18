@@ -162,7 +162,7 @@ const createWindow = async (arg?) => {
 };
 
 setInterval(() => {
-  autoUpdater.checkForUpdates();
+  autoUpdater.checkForUpdatesAndNotify();
 }, 30000);
 
 autoUpdater.on('update-available', (info) => {
