@@ -58,7 +58,6 @@ const configuration: webpack.Configuration = {
       NODE_ENV: 'production',
       DEBUG_PROD: false,
       START_MINIMIZED: false,
-      GH_TOKEN: `"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"`,
     }),
   ],
 

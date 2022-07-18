@@ -95,7 +95,6 @@ const configuration: webpack.Configuration = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production',
       DEBUG_PROD: false,
-      GH_TOKEN: `"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"`,
       SERVER_URL: 'https://api.toologin.com',
       SHOP_DOMAIN: 'toologin.com',
     }),
