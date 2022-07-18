@@ -22,7 +22,6 @@ class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
     autoUpdater.logger = log;
-    autoUpdater.autoDownload = true;
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
