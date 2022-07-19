@@ -175,24 +175,6 @@ const createWindow = async (arg?) => {
   });
 };
 
-autoUpdater.on('update-available', (info) => {
-  appUpdater.downloadUpdate();
-});
-
-autoUpdater.on('update-downloaded', (info) => {
-  const dialogOpts = {
-    type: 'info',
-    buttons: ['Restart', 'Later'],
-    title: 'Application Update',
-    message:
-      process.platform === 'win32' ? info.releaseNotes.note : info.releaseName,
-    detail: `A new version ${info.version} has been downloaded. Restart the application to apply the updates.`,
-  };
-  dialog.showMessageBox(dialogOpts).then((returnValue) => {
-    if (returnValue.response === 0) autoUpdater.quitAndInstall();
-  });
-});
-
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
