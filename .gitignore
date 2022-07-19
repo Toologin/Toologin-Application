@@ -31,6 +31,5 @@ npm-debug.log.*
 k8s/
 entryScript.sh
 nginx/
-src/renderer/
 extensions/
 assets/build/

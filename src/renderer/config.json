@@ -1,0 +1,13 @@
+{
+  "WOO_API": {
+    "url": "https://toologin.com",
+    "consumerKey": "ck_ea294b9b5ab56c6369463edf699ef5b059eaab4d",
+    "consumerSecret": "cs_cd9127ce270734fb4830bca5e3b3185a03442f6c"
+  },
+  "HEADERS": {
+    "headers": {
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    }
+  }
+}
